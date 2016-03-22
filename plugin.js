@@ -5,15 +5,18 @@ var TennuEval = {
     init: function(client, imports) {
 
         function handleEval(IRCMessage) {
+
+            if (IRCMessage.message.search(/^\>\>/) === -1) {
+                return;
+            }
+
             return imports.admin.isAdmin(IRCMessage.hostmask)
-            .then(function (result) {
-                if(!result){
-                    adminFail(IRCMessage.nickname, IRCMessage.hostmask.hostname);
-                }
-                if(IRCMessage.message.search(/^\>\>/) > -1){
-                    return ("<<"+eval(IRCMessage.message.substr(2))).split('\n');   
-                }
-            })
+                .then(function(result) {
+                    if (!result) {
+                        return adminFail(IRCMessage.nickname, IRCMessage.hostmask.hostname);
+                    }
+                    return ("<<" + eval(IRCMessage.message.substr(2))).split('\n');
+                })
         };
 
         function adminFail(nickname, hostname) {
