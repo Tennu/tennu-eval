@@ -1,6 +1,6 @@
 {
   "name": "tennu-eval",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "A plugin for the Tennu IRC framework. Evaluates javascript.",
   "main": "plugin.js",
   "repository": {
@@ -12,7 +12,9 @@
     "postversion": "git push && git push --tags && npm publish"
   },
   "author": "Victorio Berra",
-  "contributors": ["Ryan (Havvy) Scheel"],
+  "contributors": [
+    "Ryan (Havvy) Scheel"
+  ],
   "license": "ISC",
   "dependencies": {}
 }
