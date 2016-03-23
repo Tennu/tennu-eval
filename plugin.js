@@ -1,23 +1,11 @@
-var format = require("util").format;
-
-var TennuEval = {
+const TennuEval = {
     requires: ["admin"],
     init: function(client, imports) {
+        const requiresAdmin = imports.admin.requiresAdmin;
 
-        function handleEval(IRCMessage) {
-
-            if (IRCMessage.message.search(/^\>\>/) === -1) {
-                return;
-            }
-
-            return imports.admin.isAdmin(IRCMessage.hostmask)
-                .then(function(result) {
-                    if (!result) {
-                        return adminFail(IRCMessage.nickname, IRCMessage.hostmask.hostname);
-                    }
-                    return ("<<" + eval(IRCMessage.message.substr(2))).split('\n');
-                })
-        };
+        function evalIntoResponse (toEval) {
+            return ("<< " + eval(toEval)).split("\n");
+        }
 
         function adminFail(nickname, hostname) {
             return {
@@ -29,7 +17,22 @@ var TennuEval = {
 
         return {
             handlers: {
-                "privmsg": handleEval,
+                "privmsg": function (privmsg) {
+                    if (/^\>\>/.test(privmsg.message)) {
+                        return imports.admin.isAdmin(privmsg.hostmask)
+                        .then(function(isAdmin) {
+                            if (!isAdmin) {
+                                return adminFail(privmsg.nickname, privmsg.hostmask.hostname);
+                            } else {
+                                return evalIntoResponse(privmsg.message.slice(2));
+                            }
+                        });
+                    }
+                },
+
+                "!eval": requiresAdmin(function (command) {
+                    return evalIntoResponse(command.args.join(" "));
+                })
             }
         };
     }
